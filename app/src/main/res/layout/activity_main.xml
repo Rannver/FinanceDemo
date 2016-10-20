@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.fx50j.financedemo.Activity.MainActivity">
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ed_input"
+        android:hint="请输入你的指令"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ed_input"
+        android:id="@+id/btu_check"
+        android:text="start"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:background="#6169ab"
+        android:textColor="#f7f7f7"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btu_check"
+        android:id="@+id/tv_context"
+        android:text="（显示输入的内容）"
+        android:textColor="#000000"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_StockName"
+        android:layout_below="@id/tv_context"
+        android:paddingTop="10dp"
+        android:text="（显示股票名称和股票代码）"
+        android:textColor="#000000"
+        android:textSize="15sp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_NowPrice"
+        android:text="NowPrice"
+        android:layout_below="@+id/tv_StockName"
+        android:textColor="#000000"
+        android:gravity="left"
+        android:paddingTop="5dp"
+        android:paddingLeft="5dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_Time"
+        android:text="time"
+        android:layout_below="@+id/tv_StockName"
+        android:textColor="#000000"
+        android:gravity="right"
+        android:layout_alignParentRight="true"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/line1"
+        android:layout_below="@+id/tv_NowPrice"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_OpenPrice"
+            android:text="OpenPrice"
+            android:layout_below="@+id/tv_NowPrice"
+            android:textColor="#000000"
+            android:gravity="left"
+            android:paddingTop="5dp"
+            android:paddingLeft="5dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_TodayMax"
+            android:text="TodayMax"
+            android:layout_below="@+id/tv_NowPrice"
+            android:textColor="#000000"
+            android:gravity="left"
+            android:paddingTop="5dp"
+            android:paddingLeft="5dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/line2"
+        android:layout_below="@+id/line1"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_TradeNum"
+            android:text="TradeNum"
+            android:layout_below="@+id/tv_NowPrice"
+            android:textColor="#000000"
+            android:gravity="left"
+            android:paddingTop="5dp"
+            android:paddingLeft="5dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_TodayMin"
+            android:text="TodayMin"
+            android:layout_below="@+id/tv_NowPrice"
+            android:textColor="#000000"
+            android:gravity="left"
+            android:paddingTop="5dp"
+            android:paddingLeft="5dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/line3"
+        android:layout_below="@+id/line2"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_ClosePrice"
+            android:text="ClosePrice"
+            android:layout_below="@+id/tv_NowPrice"
+            android:textColor="#000000"
+            android:gravity="left"
+            android:paddingTop="5dp"
+            android:paddingLeft="5dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_TradeAmount"
+            android:text="TradeAmount"
+            android:layout_below="@+id/tv_NowPrice"
+            android:textColor="#000000"
+            android:gravity="left"
+            android:paddingTop="5dp"
+            android:paddingLeft="5dp"
+            android:layout_weight="0.8"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/im_minK"
+        android:layout_below="@+id/line3"/>
+
+</RelativeLayout>
