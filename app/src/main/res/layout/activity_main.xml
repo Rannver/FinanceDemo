@@ -164,10 +164,12 @@
 
     </LinearLayout>
 
-    <ImageView
+    <com.github.mikephil.charting.charts.LineChart
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/im_minK"
-        android:layout_below="@+id/line3"/>
+        android:layout_height="match_parent"
+        android:layout_below="@+id/line3"
+        android:id="@+id/char_Time">
+
+    </com.github.mikephil.charting.charts.LineChart>
 
 </RelativeLayout>

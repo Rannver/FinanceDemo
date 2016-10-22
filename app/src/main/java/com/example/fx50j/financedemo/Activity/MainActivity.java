@@ -7,21 +7,33 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.fx50j.financedemo.Adpter.TextViewContext;
 import com.example.fx50j.financedemo.Bean.StockCodeGsonBean;
+import com.example.fx50j.financedemo.Bean.StockHistoryGsonBean;
 import com.example.fx50j.financedemo.Bean.StockNowInformationGsonBean;
 import com.example.fx50j.financedemo.Data.StockCodeData;
+import com.example.fx50j.financedemo.Data.StockHistoryData;
 import com.example.fx50j.financedemo.Data.StockNowInformationData;
 import com.example.fx50j.financedemo.R;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.show.api.ShowApiRequest;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import okhttp3.Call;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,18 +66,21 @@ public class MainActivity extends AppCompatActivity {
     TextView tvClosePrice;
     @InjectView(R.id.tv_TradeAmount)
     TextView tvTradeAmount;
-    @InjectView(R.id.im_minK)
-    ImageView imMinK;
+    @InjectView(R.id.char_Time)
+    LineChart charTime;
+
 
     private String CODE;
     private String MARKET;
-    private String STOCKNAME, NOWPRICE, TIME, OPENPRICE, TODAYMAX, TRADENUM, TODAYMIN, CLOSEPRICE, TRADEAMOUNT,MINK,DAYK,WEEKK,MONTHK;
+    private String STOCKNAME, NOWPRICE, TIME, OPENPRICE, TODAYMAX, TRADENUM, TODAYMIN, CLOSEPRICE, TRADEAMOUNT;
+    private LineData lineData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
+
 
         btuCheck.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
         new Thread() {
             @Override
             public void run() {
+
+                //获取股票代码
                 String appid = "19283";
                 String secret = "b11338eeb2424a408a5b8a2e47557021";
                 final String res_code = new ShowApiRequest("http://route.showapi.com/131-43", appid, secret)
@@ -153,14 +170,20 @@ public class MainActivity extends AppCompatActivity {
                 MARKET = listBean.getMarket();
                 Log.d("Code", CODE);
                 Log.d("Matket", MARKET);
-                GetStockInformation(CODE);
+
+                //获取股票信息并显示
+                GetNowStockInformation(CODE);
                 Handler_Stock.post(new Thread() {
                     @Override
                     public void run() {
-                            ShowStockInformation();
+                        ShowStockInformation();
                         super.run();
                     }
                 });
+
+                //获取股票历史信息
+                GetHistoryStockInformation(CODE);
+
                 super.run();
             }
         }.start();
@@ -189,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void GetStockInformation(final String code) {
+    private void GetNowStockInformation(final String code) {
 
         String appid = "19283";
         String secret = "b11338eeb2424a408a5b8a2e47557021";
@@ -221,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void ShowStockInformation(){
+    private void ShowStockInformation() {
 
         //显示文本部分
         tvStockName.setText(STOCKNAME);
@@ -234,8 +257,96 @@ public class MainActivity extends AppCompatActivity {
         tvClosePrice.setText(CLOSEPRICE);
         tvTradeAmount.setText(TRADEAMOUNT);
 
-        //显示K线图
     }
 
+    //请求过去的股票数据
+    private void GetHistoryStockInformation(String code) {
+        String url = "http://op.juhe.cn/onebox/stock/query";
+        OkHttpUtils.get()
+                .url(url)
+                .addParams("key", "8c486fad505111bab5b9b4159fb44f2e")
+                .addParams("stock", code)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        Log.d("状态：", "网络请求失败");
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        Log.d("res", response);
+                        StockHistoryData stockHistoryData = new StockHistoryData();
+                        stockHistoryData.SetStockData(response);
+                        stockHistoryData.CheckStockData();
+                        List<StockHistoryGsonBean.ResultBean.TimeChartBean.PBean> list = stockHistoryData.GetStockTimeCharBeanList();
+                        LineData lineData = GetLineData(list);
+                        SetChart();
+                    }
+                });
+
+    }
+
+    //分时图的绘制
+    private void SetChart() {
+
+        charTime.setDrawBorders(false);
+        charTime.setNoDataText(" ");
+        charTime.setDragEnabled(false);
+        charTime.setScaleEnabled(true);
+        charTime.setPinchZoom(true);
+        charTime.setDrawGridBackground(false);
+        charTime.animateX(2500);
+
+        //X轴
+        XAxis xaxis = charTime.getXAxis();
+        xaxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xaxis.setGridColor(R.color.COLOR_LINECHAR_LINE);
+        xaxis.setGridColor(R.color.COLOR_LINECHAR_GRID);
+        xaxis.setTextColor(R.color.COLOR_LINECHAR_XTEXT);
+
+        //Y轴
+        YAxis yAxis = charTime.getAxisLeft();
+        yAxis.setEnabled(true);
+        yAxis.setLabelCount(5,false);
+        yAxis.setDrawGridLines(true);
+        yAxis.setDrawAxisLine(false);
+        yAxis.setGridColor(R.color.COLOR_LINECHAR_GRID);
+        yAxis.setTextColor(R.color.COLOR_LINECHAR_YTEXT);
+
+        //设置数据
+    }
+
+    private LineData GetLineData(List<StockHistoryGsonBean.ResultBean.TimeChartBean.PBean> list){
+
+        //X轴数据
+        ArrayList<String> xValues = new ArrayList<String>();
+        for (int index = 0;index<list.size();index++){
+            xValues.add(list.get(index).getTime());
+        }
+
+        //y轴的数据
+        ArrayList<Entry> yValues = new ArrayList<Entry>();
+        for (int index= 0 ;index<list.size();index++){
+            float price  = Float.parseFloat(list.get(index).getPrice());
+            yValues.add(new Entry(price,index));
+        }
+
+        //y轴的数据的集合
+        LineDataSet lineDataSet = new LineDataSet(yValues,"价格走势");
+
+        //用y轴的集合来设置参数
+        lineDataSet.setLineWidth(1.75f);  //线宽
+        lineDataSet.setColors(new int[]{R.color.COLOR_LINECHAR_LINE_MAIN});  //线的颜色
+        lineDataSet.setHighLightColor(R.color.COLOR_LINECHAR_HIGHTLIGHTCOLOR); //高亮线的颜色
+
+        ArrayList<LineDataSet> lineDataSets = new ArrayList<>();
+        lineDataSets.add(lineDataSet);
+
+        LineData data = new LineData(xValues,lineDataSets);
+
+        return data;
+
+    }
 
 }
