@@ -281,29 +281,32 @@ public class MainActivity extends AppCompatActivity {
                         stockHistoryData.CheckStockData();
                         List<StockHistoryGsonBean.ResultBean.TimeChartBean.PBean> list = stockHistoryData.GetStockTimeCharBeanList();
                         LineData lineData = GetLineData(list);
-                        SetChart();
+                        SetChart(lineData);
                     }
                 });
 
     }
 
     //分时图的绘制
-    private void SetChart() {
+    private void SetChart(LineData lineData) {
 
         charTime.setDrawBorders(false);
         charTime.setNoDataText(" ");
-        charTime.setDragEnabled(false);
+        charTime.setDragEnabled(true);
         charTime.setScaleEnabled(true);
         charTime.setPinchZoom(true);
         charTime.setDrawGridBackground(false);
         charTime.animateX(2500);
+        charTime.setDescription("");
 
         //X轴
         XAxis xaxis = charTime.getXAxis();
         xaxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xaxis.setGridColor(R.color.COLOR_LINECHAR_LINE);
+        xaxis.setSpaceBetweenLabels(4);
         xaxis.setGridColor(R.color.COLOR_LINECHAR_GRID);
         xaxis.setTextColor(R.color.COLOR_LINECHAR_XTEXT);
+        xaxis.setLabelsToSkip(40);
+        xaxis.setAvoidFirstLastClipping(true);
 
         //Y轴
         YAxis yAxis = charTime.getAxisLeft();
@@ -315,6 +318,7 @@ public class MainActivity extends AppCompatActivity {
         yAxis.setTextColor(R.color.COLOR_LINECHAR_YTEXT);
 
         //设置数据
+        charTime.setData(lineData);
     }
 
     private LineData GetLineData(List<StockHistoryGsonBean.ResultBean.TimeChartBean.PBean> list){
@@ -328,19 +332,23 @@ public class MainActivity extends AppCompatActivity {
         //y轴的数据
         ArrayList<Entry> yValues = new ArrayList<Entry>();
         for (int index= 0 ;index<list.size();index++){
-            float price  = Float.parseFloat(list.get(index).getPrice());
-            yValues.add(new Entry(price,index));
+            if (list.get(index).getPrice()!=null){
+                float price  = Float.parseFloat(list.get(index).getPrice());
+                yValues.add(new Entry(price,index));
+            }
         }
 
         //y轴的数据的集合
         LineDataSet lineDataSet = new LineDataSet(yValues,"价格走势");
 
         //用y轴的集合来设置参数
-        lineDataSet.setLineWidth(1.75f);  //线宽
-        lineDataSet.setColors(new int[]{R.color.COLOR_LINECHAR_LINE_MAIN});  //线的颜色
-        lineDataSet.setHighLightColor(R.color.COLOR_LINECHAR_HIGHTLIGHTCOLOR); //高亮线的颜色
+        lineDataSet.setLineWidth(1.5f);  //线宽
+        lineDataSet.setColor(getResources().getColor(R.color.COLOR_LINECHAR_LINE_MAIN));
+        lineDataSet.setHighLightColor(getResources().getColor(R.color.COLOR_LINECHAR_HIGHTLIGHTCOLOR)); //高亮线的颜色
+        lineDataSet.setDrawCircles(false);
+        lineDataSet.setDrawCircleHole(false);
 
-        ArrayList<LineDataSet> lineDataSets = new ArrayList<>();
+        ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
         lineDataSets.add(lineDataSet);
 
         LineData data = new LineData(xValues,lineDataSets);
